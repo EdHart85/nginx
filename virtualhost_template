@@ -1,116 +1,156 @@
+# This configuration was develop with the help of Nginx documentation and several others sources that I found on the Internet.
+# It should work for most simple enviroments or at least help you build your own configuration for different scenarios.
+# Tested on Nginx 1.14.2 / Debian GNU/Linux 10 (buster)
+
+# by Eduardo Hartmann (https://github.com/EdHart85)
+
+
 # Redirect all http traffic to https
 server {
-        listen 80;
-        server_name www.example.com;
-        return 301 https://$host$request_uri;
+	# Listen on HTTP default port
+	listen 80;
+	
+	# Virtualhost name
+	server_name www.example.com;
+	
+	# Redirect to HTTPS with code 301 (Moved Permanently)
+	return 301 https://$host$request_uri;
 }
 
-server
-{
-        # Main
-        listen 443 ssl http2;
+server {
+	# Listen on HTTPS default port using SSL and enabling HTTP/2 protocol
+	listen 443 ssl http2;
+	
+	# Virtualhost name
+	server_name www.example.com;
 
-        client_max_body_size 45M;
+	# Virtualhost root directory
+	root /var/www/example;
+	
+	# Files that will be used as an index
+	index index.php index.html index.htm;
 
-        root /var/www/example;
-        server_name www.example.com;
-        index index.php index.html index.htm;
+	# Increase buffer size for reading client request body (default: 16k)
+	client_body_buffer_size 128k;
+	
+	# Increase maximum allowed size of the client request body (default: 1M)
+	client_max_body_size 45M;
 
-
-        # SSL
+	# SSL
 	# If you don't have a SSL certificate of your own,
 	# consider using Let's Encrypt: https://letsencrypt.org
 	# Check the documentation for detailed information
 	# http://nginx.org/en/docs/http/ngx_http_ssl_module.html
-        ssl on;
+	ssl on;
 	
 	# Your public key plus intermediate certificates
-        ssl_certificate /etc/nginx/certs/example_com_chained.crt;
+	ssl_certificate /etc/nginx/certs/example_com_chained.crt;
 	
 	# Your private key
-        ssl_certificate_key /etc/nginx/certs/example_com.key;
+	ssl_certificate_key /etc/nginx/certs/example_com.key;
 	
 	# Trusted CA certificates in the PEM format used to verify client certificates and OCSP
-        ssl_trusted_certificate /etc/nginx/certs/ca_bundle_intermediate.crt;
+	ssl_trusted_certificate /etc/nginx/certs/ca_bundle_intermediate.crt;
         
 	# How long a SSL session can be reused
 	ssl_session_timeout 30m;
 	
 	# A shared SSL cache between all workers
 	# 1MB can store about 4000 sessions. Adjust it according to your needs
-        ssl_session_cache shared:SSL:10m;
+	ssl_session_cache shared:SSL:10m;
         
 	# Cryptographic ciphers and protocols
 	# Very high security (recommended): TLSv1.3 and TLSv1.2
 	# High security: TLS1.2
 	# High compatibility (several weak ciphers): TLSv1.3, TLSv1.2, TLSv1.1 and TLSv1
-        ssl_protocols TLSv1.3 TLSv1.2;
+	ssl_protocols TLSv1.3 TLSv1.2;
         
-        # A nice and secure set of encryption algorithms that preserve compatibility for most cases
-        ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:HIGH:!eNULL:!aNULL';
+	# A nice and secure set of encryption algorithms that preserve compatibility for most cases
+	ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:HIGH:!eNULL:!aNULL';
         
-        # Use server order ciphers for improved security
-        ssl_prefer_server_ciphers   on;
+	# Use server order ciphers for improved security
+	ssl_prefer_server_ciphers   on;
 
-        # SSL OCSP Stapling
+	# SSL OCSP Stapling
 	# Improve securityu by checking the revocation status of the certificates
-        ssl_stapling on;
-        ssl_stapling_verify on;
-        resolver 1.1.1.1 8.8.8.8 valid=300s;
-        resolver_timeout 5s;
+	ssl_stapling on;
+	ssl_stapling_verify on;
+	resolver 1.1.1.1 8.8.8.8 valid=300s;
+	resolver_timeout 5s;
 
-        # SSL Diffie-Hellman Parameter
+	# SSL Diffie-Hellman Parameter
 	# Use the following command to generate a Diffie-Hellman Parameter file
 	# with a 4096 bits (very strong key) on a Linux enviroment (it may take a long time!):
 	# openssl dhparam -out /etc/nginx/certs/dhparam.pem 4096
-        ssl_dhparam /etc/nginx/certs/dhparam.pem;
+	ssl_dhparam /etc/nginx/certs/dhparam.pem;
 
-        # HSTS
+	# HSTS
 	# Tells the webrowser to always use HTTPS when accessing this website
-        add_header   Strict-Transport-Security "max-age=31536000;";
-        add_header   X-Content-Type-Options nosniff;
+	add_header   Strict-Transport-Security "max-age=31536000;";
+	add_header   X-Content-Type-Options nosniff;
 
-        # Logging Settings
-        access_log /var/log/nginx/example_access.log combined_ssl;
-        error_log /var/log/nginx/example_error.log;
+	# Logging Settings
+	access_log /var/log/nginx/example_access.log combined_ssl;
+	error_log /var/log/nginx/example_error.log;
 
-        location / {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ =404;
-                
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+			
 		# If you need to use friendly URLs use the configuration
-                # below instead
-                # try_files $uri $uri/ /index.php;
+		# below instead
+		# try_files $uri $uri/ /index.php;
 
-                # Use this if you need to restrict access only
+		# Use this if you need to restrict access only
 		# for some host/networks
-                # allow   192.0.2.0/24;
-                # deny the rest of the world
-                # deny    all;
-                }
+		# allow   192.0.2.0/24;
+		# deny the rest of the world
+		# deny    all;
+	}
 
-        # Static files caching
-        location ~* \.(js|css|png|jpg|jpeg|gif|ico)$
-        {
-                expires 1y;
-                log_not_found off;
-        }
+	# PHP
+	location ~ [^/]\.php(/|$) {
+		# Check this out to better understand the following parameters:
+		# https://www.nginx.com/resources/wiki/start/topics/examples/phpfcgi/
+		
+		# Check whether the *.php does indeed exist to prevent Nginx to feeding PHP-FPM non php script file
+		fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+		if (!-f $document_root$fastcgi_script_name) {
+			return 404;
+		}
+	
+		# Mitigate https://httpoxy.org/ vulnerabilities
+		fastcgi_param HTTP_PROXY "";
+	
+		# Change this accordingly to your PHP installation
+		fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+		fastcgi_index index.php;
 
-        # PHP and caching
-        location ~ [^/]\.php(/|$)
-        {
-				        # Change this accordingly to your PHP installation
-                fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
-                
-				        fastcgi_index index.php;
-                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-                include fastcgi_params;
-                fastcgi_param APPLICATION_ENV production;
-                fastcgi_buffers 16 32k;
-                fastcgi_buffer_size 64k;
-                fastcgi_connect_timeout 300;
-                fastcgi_send_timeout 300;
-                fastcgi_read_timeout 30000;
-        }
+		# SCRIPT_FILENAME parameter is used for PHP FPM determining the script name.
+		# If this parameter is not set, PHP FPM responses 200 OK with empty content, and there is no error or warning
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+		# Include the fastcgi_param setting
+		include fastcgi_params;
+	}
+	
+	# Do not log favicon requests, even if it doesn't exist
+	location = /favicon.ico {
+			log_not_found off;
+			access_log off;
+	}
+
+   # Static files caching
+	location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+			expires max;
+			log_not_found off;
+	}
+	
+	# Do not log robots.txt requests, even if it doesn't exist
+	location = /robots.txt {
+			allow all;
+			log_not_found off;
+			access_log off;
+	}
 }

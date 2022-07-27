@@ -137,20 +137,18 @@ server {
 	
 	# Do not log favicon requests, even if it doesn't exist
 	location = /favicon.ico {
-			log_not_found off;
-			access_log off;
+		log_not_found off;
 	}
 
-   # Static files caching
+	# Static files caching
 	location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
-			expires max;
-			log_not_found off;
+		expires max;
 	}
 	
-	# Do not log robots.txt requests, even if it doesn't exist
-	location = /robots.txt {
-			allow all;
-			log_not_found off;
-			access_log off;
-	}
+        # Block access to "hidden" files and directories whose names begin with a
+        # period. This includes directories used by version control systems such
+        # as Subversion or Git to store control files.
+        location ~ (^|/)\. {
+                return 403;
+        }
 }

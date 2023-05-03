@@ -8,9 +8,9 @@
 * [Nginx installation and initial setup](#installation)
 * [nginx.conf](#nginxconf)
 * [virtualhost_template](#virtualhosttemplate)
-  * [server_name](#server_name)
-  * [dhparam](#dhparam)
-  * [tls](#tls)
+  * [Virtualhost Name](#server_name)
+  * [DH parameters](#dhparam)
+  * [Cryptographic ciphers and protocols](#tls)
   * [Friendly URLs](#friendlyurls)
   * [PHP-FPM version](#phpfpm)
 <!--te-->
@@ -41,20 +41,24 @@ chmod 400 /etc/nginx/certs
 
 <h2>nginx.conf</h2>
 
-This nginx.conf file should work well for most common enviroments. I recommend you to take a look at all parameters used and what it does. I tried to comment it as much and as clear as I could. Nginx official documentation (https://nginx.org/en/docs/) can help you out too.nginx
+This nginx.conf file should work well for most common enviroments.
+
+I recommend you to take a look at all parameters used and what it does. I tried to comment it as much and as clear as I could. Nginx official documentation (https://nginx.org/en/docs/) can help you out too.nginx
 
 <h2>virtualhost_template</h2>
 
-I'll try to descrive below the most important aspects of the virtualhost template file. Once again I tried to comment it as much and as clear as I could.
+I'll try to descrive below the most important aspects of the virtualhost_template file. Yet I recommend you to check the whole file.
 
 <h3>server_name</h3>
 
 <h3>dhparam</h3>
 
 You can learn more about Diffie-Hellman group parameters here: https://wiki.openssl.org/index.php/Diffie-Hellman_parameters
+
 Your Diffie-Hellman group parameters should match the key size used in the server's certificate. If you use a 2048-bit RSA prime in the server's certificate, then use a 2048-bit Diffie-Hellman group for key agreement.
 
 I would recommend you to use a different DH parameter file for which virtualhost on your server for increase security.
+
 You can generate a DH parameter file using the following command line:
 
 ```bash
@@ -67,8 +71,19 @@ Don't forget to secure the file permissions:
 chmod 400 /etc/nginx/certs/mywebsite_dhparam.pem
 ```
 
-<h3>tls</h3>
+<h3>Cryptographic ciphers and protocols</h3>
+I strongly recommend using only TLSv1.2 and TLS1.3 as of now there are no know vulnerabilities in TLSv1.3 and TLSv1.2 is very secure with the right configuration. Older TLS versions (1.1 and 1.0) should not be used as they have many security vulnerabilities that can be exploit by an attacker.
+
+After a lot of reading and testing, I came up with a nice and secure set of encryption algorithms that preserve compatibility for most cases.
+
+Once you are done with your virtualhost configuration, you can test it here: https://www.ssllabs.com/ssltest/
+
 
 <h3>Friendly URLs</h3>
 
+Nginx configuration varies if your virtualhost uses friendly url's. Check the virtualhost_template file and choose the configuration that suits each case.
+
+
 <h3>PHP-FPM version</h3>
+
+You may have to adapt the parameter 'fastcgi_pass' according to your PHP-FPM version.

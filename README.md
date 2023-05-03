@@ -18,6 +18,7 @@
 <h2>Enviroment</h2>
 
 I'm using Debian (best GNU/Linux distro, if you ask me!), so everything here will assume that you are using it too.
+
 Tested on Nginx 1.14.2 / Debian GNU/Linux 10 (buster)
 
 <h2>Nginx installation and initial setup</h2>
@@ -50,6 +51,17 @@ I recommend you to take a look at all parameters used and what it does. I tried 
 I'll try to descrive below the most important aspects of the virtualhost_template file. Yet I recommend you to check the whole file.
 
 <h3>server_name</h3>
+
+Remember to adjust the following parameters according to your virtualhost:
+server_name (both occurences)
+root
+ssl_certificate
+ssl_certificate_key
+ssl_trusted_certificate
+resolver
+ssl_dhparam
+access_log
+error_log
 
 <h3>dhparam</h3>
 

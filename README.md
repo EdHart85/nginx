@@ -1,7 +1,7 @@
 <h1 align="center">Nginx Configuration
 
 </h1>
-<p align="center">Some Nginx configuration examples that might work for most cases.</p>
+<p align="center">Nginx configuration examples that might work for most cases that use PHP-FPM.</p>
 
 <!--ts-->
 * [Enviroment](#enviroment)
@@ -24,11 +24,12 @@ Tested on Nginx 1.14.2 / Debian GNU/Linux 10 (buster)
 
 <h2>Nginx installation and initial setup</h2>
 
--Install nginx using 'apt':
+-Install Nginx using 'apt':
 ```bash
 apt update
 apt install nginx
 ```
+Obs: At this time I'll not describe PHP-FPM installation.
 
 -Create a directory for your virtualhosts certificates:
 ```bash

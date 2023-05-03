@@ -35,10 +35,11 @@ apt install nginx
 mkdir /etc/nginx/certs
 ```
 
--Adjust permissions:
+-Place your certificates files in this directory and adjust permissions:
 ```bash
+mv /home/user/mycertificate.xyz /etc/nginx/certs
 chown -R root:root /etc/nginx/certs
-chmod 400 /etc/nginx/certs
+chmod -R 400 /etc/nginx/certs
 ```
 
 
@@ -46,11 +47,12 @@ chmod 400 /etc/nginx/certs
 
 This nginx.conf file should work well for most common enviroments.
 
-I recommend you to take a look at all parameters used and what it does. I tried to comment it as much and as clear as I could. Nginx official documentation (https://nginx.org/en/docs/) can help you out too.nginx
+I recommend you to take a look at all parameters used and what it does. I tried to comment it as much and as clear as I could. Nginx official documentation (https://nginx.org/en/docs/) can help you out, too.
+
 
 <h2>virtualhost_template</h2>
 
-I'll try to descrive below the most important aspects of the virtualhost_template file. Yet I recommend you to check the whole file.
+Here we will describe the most important aspects of the 'virtualhost_template' file. However, it's recommended to check the entire file.
 
 
 <h3>server_name</h3>
@@ -83,7 +85,7 @@ Your Diffie-Hellman group parameters should match the key size used in the serve
 
 I would recommend you to use a different DH parameter file for which virtualhost on your server for increase security.
 
-You can generate a DH parameter file using the following command line:
+You can generate a DH parameter file using the following command line (it may take several minutes to complete):
 
 ```bash
 openssl dhparam -out /etc/nginx/certs/mywebsite_dhparam.pem 2048

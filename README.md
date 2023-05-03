@@ -78,7 +78,7 @@ access_log
 error_log
 
 
-<h3>dhparam</h3>
+<h3>DH parameters</h3>
 
 You can learn more about Diffie-Hellman group parameters here: https://wiki.openssl.org/index.php/Diffie-Hellman_parameters
 

@@ -2,7 +2,7 @@
 # It should work for most simple enviroments or at least help you build your own configuration for different scenarios.
 # Tested on Nginx 1.14.2 / Debian GNU/Linux 10 (buster)
 
-# by Eduardo Hartmann (https://github.com/EdHart85)
+# by Eduardo Hartmann (https://github.com/EdHart85/nginx)
 
 
 # Redirect all http traffic to https
@@ -44,10 +44,10 @@ server {
 	ssl on;
 	
 	# Your public key plus intermediate certificates
-	ssl_certificate /etc/nginx/certs/example_com_chained.crt;
+	ssl_certificate /etc/nginx/certs/example_chained.crt;
 	
 	# Your private key
-	ssl_certificate_key /etc/nginx/certs/example_com.key;
+	ssl_certificate_key /etc/nginx/certs/example.key;
 	
 	# Trusted CA certificates in the PEM format used to verify client certificates and OCSP
 	ssl_trusted_certificate /etc/nginx/certs/ca_bundle_intermediate.crt;
@@ -80,9 +80,9 @@ server {
 
 	# SSL Diffie-Hellman Parameter
 	# Use the following command to generate a Diffie-Hellman Parameter file
-	# with a 4096 bits (very strong key) on a Linux enviroment (it may take a long time!):
-	# openssl dhparam -out /etc/nginx/certs/dhparam.pem 4096
-	ssl_dhparam /etc/nginx/certs/dhparam.pem;
+	# with a 2048 bits (strong key) on a Linux enviroment (it may take a long time!):
+	# openssl dhparam -out /etc/nginx/certs/example_dhparam.pem 2048
+	ssl_dhparam /etc/nginx/certs/example_dhparam.pem;
 
 	# HSTS
 	# Tells the webrowser to always use HTTPS when accessing this website
@@ -93,7 +93,26 @@ server {
 	access_log /var/log/nginx/example_access.log combined_ssl;
 	error_log /var/log/nginx/example_error.log;
 
+	# Custom error pages - Client side errors
+	error_page 400 401 403 404 /custom_40x.html;
+	location = /custom_40x.html {
+		root /var/www/custom_error;
+		internal;
+	}
+	
+	# Custom error pages - Server side errors
+	error_page 500 502 503 504 /custom_50x.html;
+	location = /custom_50x.html {
+		root /var/www/custom_error;
+		internal;
+	}
+
 	location / {
+	
+		# If 'under_maintenance.html' exists, then use it
+		if (-f $document_root/under_maintenance.html) {
+			return 503;
+			
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
 		try_files $uri $uri/ =404;

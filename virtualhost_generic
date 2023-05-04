@@ -41,7 +41,6 @@ server {
 	# consider using Let's Encrypt: https://letsencrypt.org
 	# Check the documentation for detailed information
 	# http://nginx.org/en/docs/http/ngx_http_ssl_module.html
-	ssl on;
 	
 	# Your public key plus intermediate certificates
 	ssl_certificate /etc/nginx/certs/example_chained.crt;
@@ -96,22 +95,40 @@ server {
 	# Custom error pages - Client side errors
 	error_page 400 401 403 404 /custom_40x.html;
 	location = /custom_40x.html {
-		root /var/www/custom_error;
+		root /var/www/errorpages;
 		internal;
 	}
 	
 	# Custom error pages - Server side errors
 	error_page 500 502 503 504 /custom_50x.html;
 	location = /custom_50x.html {
-		root /var/www/custom_error;
+		root /var/www/errorpages;
 		internal;
 	}
 
+	# Allow "Well-Known URIs" as per RFC 5785
+	location ~* ^/.well-known/ {
+		allow all;
+	}
+	
+	# Block access to "hidden" files and directories whose names begin with a
+	# period. This includes directories used by version control systems such
+	# as Subversion or Git to store control files.
+	location ~* (^|/)\. {
+		return 403;
+	}
+	
+	# Don't allow direct access to PHP files in the vendor directory.
+	location ~* /vendor/.*\.php$ {
+		deny all;
+		return 404;
+	}
+	
 	location / {
 	
-		# If 'under_maintenance.html' exists, then use it
-		if (-f $document_root/under_maintenance.html) {
-			return 503;
+		# Uncomment to following line if you need to take your
+		# system down for maintenance
+		# return 503 $document_root/under_maintenance.html;
 			
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
@@ -132,12 +149,12 @@ server {
 	location ~ [^/]\.php(/|$) {
 		# Check this out to better understand the following parameters:
 		# https://www.nginx.com/resources/wiki/start/topics/examples/phpfcgi/
-		
+				
 		# Check whether the *.php does indeed exist to prevent Nginx to feeding PHP-FPM non php script file
-		fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-		if (!-f $document_root$fastcgi_script_name) {
-			return 404;
-		}
+		# For instance, if a request is made for /forum/avatar/1232.jpg/file.php which does not exist but 
+		# if /forum/avatar/1232.jpg does, the PHP interpreter will process /forum/avatar/1232.jpg instead.
+		# If this contains embedded PHP code, this code will be executed accordingly.
+		location ~ \..*/.*\.php$ {return 404;}
 	
 		# Mitigate https://httpoxy.org/ vulnerabilities
 		fastcgi_param HTTP_PROXY "";
@@ -161,13 +178,7 @@ server {
 
 	# Static files caching
 	location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
-		expires max;
+		expires 3600; # 1 hour
 	}
-	
-        # Block access to "hidden" files and directories whose names begin with a
-        # period. This includes directories used by version control systems such
-        # as Subversion or Git to store control files.
-        location ~ (^|/)\. {
-                return 403;
-        }
+}
 }

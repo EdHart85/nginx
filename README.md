@@ -7,7 +7,7 @@
 * [Enviroment](#enviroment)
 * [Nginx installation and initial setup](#installation)
 * [nginx.conf](#nginxconf)
-* [virtualhost_template](#virtualhosttemplate)
+* [virtualhost_generic.conf](#virtualhost)
   * [Virtualhost Name](#server_name)
   * [DH parameters](#dhparam)
   * [Cryptographic ciphers and protocols](#tls)
@@ -51,9 +51,9 @@ This nginx.conf file should work well for most common enviroments.
 I recommend you to take a look at all parameters used and what it does. I tried to comment it as much and as clear as I could. Nginx official documentation (https://nginx.org/en/docs/) can help you out, too.
 
 
-<h2>virtualhost_template</h2>
+<h2>virtualhost_generic.conf</h2>
 
-Here we will describe the most important aspects of the 'virtualhost_template' file. However, it's recommended to check the entire file.
+Here we will describe the most important aspects of the 'virtualhost_generic.conf' file. However, it's recommended to check the entire file.
 
 
 <h3>server_name</h3>
@@ -68,10 +68,6 @@ ssl_certificate
 ssl_certificate_key
 
 ssl_trusted_certificate
-
-resolver
-
-ssl_dhparam
 
 access_log
 
@@ -102,14 +98,9 @@ chmod 400 /etc/nginx/certs/mywebsite_dhparam.pem
 <h3>Cryptographic ciphers and protocols</h3>
 I strongly recommend using only TLSv1.2 and TLS1.3 as of now there are no know vulnerabilities in TLSv1.3 and TLSv1.2 is very secure with the right configuration. Older TLS versions (1.1 and 1.0) should not be used as they have many security vulnerabilities that can be exploit by an attacker.
 
-After a lot of reading and testing, I came up with a nice and secure set of encryption algorithms that preserve compatibility for most cases.
+After a lot of reading and testing, I came to the conclusion that Mozilla's cipher recommendation is great. You can find it here: https://ssl-config.mozilla.org/
 
 Once you are done with your virtualhost configuration, you can test it here: https://www.ssllabs.com/ssltest/
-
-
-<h3>Friendly URLs</h3>
-
-Nginx configuration varies if your virtualhost uses friendly url's. Check the virtualhost_template file and choose the configuration that suits each case.
 
 
 <h3>PHP-FPM version</h3>

@@ -11,7 +11,6 @@
   * [Virtualhost Name](#server_name)
   * [DH parameters](#dhparam)
   * [Cryptographic ciphers and protocols](#tls)
-  * [Friendly URLs](#friendlyurls)
   * [PHP-FPM version](#phpfpm)
 <!--te-->
 

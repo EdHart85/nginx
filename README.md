@@ -105,3 +105,8 @@ Once you are done with your virtualhost configuration, you can test it here: htt
 <h3>PHP-FPM version</h3>
 
 You may have to adapt the parameter 'fastcgi_pass' according to your PHP-FPM version.
+
+
+
+
+![](https://visitor-badge.laobi.icu/badge?page_id=EdHart85.nginx)
